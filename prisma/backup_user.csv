@@ -1,0 +1,12 @@
+id,email,username,password,role,verified,createdAt,updatedAt,responsibleId
+134,Alcantara@example.org,Alcántara,password2,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+69,patricio.gomez@sotex.cl,PRGM,$2b$10$Sgnl7F9AZyslkoBCDPwY9e3a4I.IDXImpnSTgFKN06HaBrXhjgjRO,ADMIN,t,2024-05-25 04:45:35.56,2024-05-25 04:46:34.224,
+135,DonMauro@example.org,Don Mauro,password3,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+73,gabriela.cea@sotex.cl,Gabriela Cea,$2b$10$JFr2ELRxlsImYejCfKuOqe3OWYCM28bxAG7FlB6G5Sp9XTpal/0Re,USER,t,2024-05-27 13:07:12.921,2024-05-27 13:44:05.673,
+71,daniela.lubbert@sotex.cl,Daniela Lübbert,$2b$10$gfGO3y3vimDLlYTikeJWlutfH9hO9Q6kyMjYJZbKF3PtIqOGutpOK,USER,t,2024-05-25 04:47:05.198,2024-05-27 13:45:18.901,
+136,Queilen@example.org,Queilen,password4,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+137,CasiqueI@example.org,Casique I,password6,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+138,Bucalemu@example.org,Bucalemu,password8,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+139,Paniahue@example.org,Paniahue,password9,NAVE,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+140,jackie.anderson@example.org,jackie.anderson,password10,MANTENCION,t,2024-05-30 19:24:31.926,2024-05-30 19:24:31.926,
+141,marco.molina@sotex.cl,Marco Molina,"",NEW_USER,f,2024-06-01 00:21:55.581,2024-06-01 00:21:55.581,

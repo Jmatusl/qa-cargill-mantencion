@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_DATABASE_URL")
+}
+
+model User {
+  id           Int                        @id @default(autoincrement())
+  email        String                     @unique
+  username     String
+  password     String
+  verified     Boolean                    @default(false)
+  lastLogin    DateTime?
+  lastActivity DateTime?
+  state        String                     @default("ACTIVE")
+  tokens       Token[]
+  requests     MaintenanceRequestOnUser[]
+  // notificationGroups NotificationGroupOnUser[]
+  responsible  Responsible?
+  ship         Ships?                     @relation(fields: [shipId], references: [id])
+  shipId       Int?
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+
+  roles UserRole[]
+
+  @@index([shipId], name: "idx_user_shipId")
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  url       String?
+  type      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId], name: "idx_token_userId")
+}
+
+model Ships {
+  id                  Int                  @id @default(autoincrement())
+  name                String               @unique
+  folio_id            String?              @unique
+  description         String?
+  observations        String?
+  state               Boolean              @default(true)
+  equipments          Equipment[]
+  maintenanceRequests MaintenanceRequest[]
+  users               User[]
+  role                Role?                @relation(fields: [roleId], references: [id])
+  roleId              Int?                 @unique // Clave foránea para Role
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name], name: "idx_ships_name")
+}
+
+model MaintenanceRequest {
+  id                 Int                        @id @default(autoincrement())
+  folio              String?                    @unique
+  equipment_id       Int
+  shipId             Int
+  equipment          Equipment?                 @relation(fields: [equipment_id], references: [id])
+  ship               Ships                      @relation(fields: [shipId], references: [id])
+  faultType          String
+  description        String
+  actionsTaken       String? //mantenemos el campo actionsTaken para compatibilidad con la versión anterior
+  actionsTakenlog    Json[]                     @default([])
+  status             String                     @default("SOLICITADO")
+  realSolution       DateTime?
+  users              MaintenanceRequestOnUser[]
+  estimatedSolutions EstimatedSolution[]
+  photoUrl           String?
+  notifications      GeneratedNotification[]
+  responsibleId      Int
+  photos             MaintenancePhoto[] 
+  responsible        Responsible                @relation(fields: [responsibleId], references: [id])
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  @@index([shipId], name: "idx_maintenance_shipId")
+  @@index([equipment_id], name: "idx_maintenance_equipmentId")
+}
+
+model Equipment {
+  id            Int                  @id @default(autoincrement())
+  area          String
+  subarea       String
+  name          String
+  brand         String
+  model         String
+  series        String
+  extra         String?
+  status        String?
+  active        Boolean              @default(true)
+  shipId        Int
+  responsibleId Int
+  requests      MaintenanceRequest[]
+  ship          Ships                @relation(fields: [shipId], references: [id])
+  responsible   Responsible          @relation(fields: [responsibleId], references: [id])
+  changeLog     Json[]               @default([])
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([area], name: "idx_area")
+  @@index([area, subarea], name: "idx_area_subarea")
+  @@index([shipId], name: "idx_equipment_shipId")
+  @@index([responsibleId], name: "idx_equipment_responsibleId")
+}
+
+model Responsible {
+  id                  Int                  @id @default(autoincrement())
+  userId              Int?                 @unique
+  user                User?                @relation(fields: [userId], references: [id])
+  name                String               @unique
+  equipments          Equipment[]
+  maintenanceRequests MaintenanceRequest[] // Add this line to establish the relationship
+  area                String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([userId], name: "idx_responsible_userId")
+}
+
+model MaintenanceRequestOnUser {
+  id                   Int      @id @default(autoincrement()) // Nuevo campo `id` como clave primaria
+  userId               Int
+  maintenanceRequestId Int
+  actionTimestamp      DateTime @default(now()) // Nuevo campo para registrar la fecha y hora de la acción
+  details              String? // Nuevo campo para almacenar detalles adicionales
+
+  user               User               @relation(fields: [userId], references: [id])
+  maintenanceRequest MaintenanceRequest @relation(fields: [maintenanceRequestId], references: [id])
+
+  @@index([maintenanceRequestId], name: "idx_mru_maintenanceRequestId")
+  @@index([userId], name: "idx_mru_userId")
+}
+
+model EstimatedSolution {
+  id                   Int                @id @default(autoincrement())
+  date                 DateTime
+  comment              String?
+  maintenanceRequestId Int
+  maintenanceRequest   MaintenanceRequest @relation(fields: [maintenanceRequestId], references: [id])
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([maintenanceRequestId], name: "idx_es_maintenanceRequestId")
+}
+
+model NotificationGroup {
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @unique
+  details               String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  roles                 NotificationGroupRole[]
+  GeneratedNotification GeneratedNotification[]
+  // NotificationGroupOnUser NotificationGroupOnUser[]
+
+  UserRole UserRole[]
+}
+
+model NotificationGroupRole {
+  notificationGroupId Int
+  roleId              Int
+  notificationGroup   NotificationGroup @relation(fields: [notificationGroupId], references: [id])
+  role                Role              @relation(fields: [roleId], references: [id])
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@id([notificationGroupId, roleId])
+  @@index([roleId], name: "idx_ngr_roleId")
+  @@index([notificationGroupId], name: "idx_ngr_notificationGroupId")
+}
+
+// model NotificationGroupOnUser {
+//   userId              Int
+//   notificationGroupId Int
+//   sendEmail           Boolean           @default(true)
+//   user                User              @relation(fields: [userId], references: [id])
+//   notificationGroup   NotificationGroup @relation(fields: [notificationGroupId], references: [id])
+
+//   @@id([userId, notificationGroupId])
+//   @@index([notificationGroupId], name: "idx_ngu_notificationGroupId")
+//   @@index([userId], name: "idx_ngu_userId")
+// }
+
+model GeneratedNotification {
+  id                   Int                @id @default(autoincrement())
+  maintenanceRequestId Int
+  notificationGroupId  Int?
+  type                 String
+  title                String
+  message              String
+  failureType          String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  maintenanceRequest   MaintenanceRequest @relation(fields: [maintenanceRequestId], references: [id])
+  notificationGroup    NotificationGroup? @relation(fields: [notificationGroupId], references: [id])
+
+  @@index([maintenanceRequestId], name: "idx_notification_maintenanceRequestId")
+}
+
+model Role {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String?
+  users       UserRole[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  Ships  Ships[]
+  shipId Int?    @unique // no utilizado en el modelo
+
+  NotificationGroupRole NotificationGroupRole[]
+}
+
+model UserRole {
+  userId              Int
+  roleId              Int
+  notificationGroupId Int                @default(0) // Valor predeterminado en lugar de nulo
+  emailNotifications  Boolean            @default(true)
+  user                User               @relation(fields: [userId], references: [id])
+  role                Role               @relation(fields: [roleId], references: [id])
+  notificationGroup   NotificationGroup? @relation(fields: [notificationGroupId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, roleId, notificationGroupId]) // Clave primaria compuesta
+  @@index([roleId], name: "idx_ur_roleId")
+  @@index([userId], name: "idx_ur_userId")
+  @@index([notificationGroupId], name: "idx_ur_notificationGroupId")
+}
+
+model RequestType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  state       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MaintenancePhoto {
+  id                   Int                 @id @default(autoincrement())
+  url                  String              // ruta o URL donde guardes la imagen
+  filename             String?             // opcional, nombre original
+  maintenanceRequest   MaintenanceRequest  @relation(fields: [maintenanceRequestId], references: [id])
+  maintenanceRequestId Int
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  @@index([maintenanceRequestId], name: "idx_photo_maintenanceRequestId")
+}

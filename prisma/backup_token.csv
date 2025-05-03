@@ -1,0 +1,6 @@
+id,userId,token,url,type,expiresAt,used,createdAt,updatedAt
+1,69,77d5ddf1390a02a33b2f22f33e280e85,https://geop-dev.sotex.app/auth/newpassword/77d5ddf1390a02a33b2f22f33e280e85,newUserPassword,2024-05-26 04:45:35.553,t,2024-05-25 04:45:35.571,2024-05-25 04:45:55.776
+3,71,46cabbebcce4ab3b68e3bfc8acb7e563,https://geop-dev.sotex.app/auth/newpassword/46cabbebcce4ab3b68e3bfc8acb7e563,newUserPassword,2024-05-26 04:47:05.192,f,2024-05-25 04:47:05.203,2024-05-25 04:47:05.203
+5,73,6eaa4339106755413890f435e93cbea4,https://geop-dev.sotex.app/auth/newpassword/6eaa4339106755413890f435e93cbea4,newUserPassword,2024-05-28 13:07:12.786,t,2024-05-27 13:07:12.933,2024-05-27 13:44:05.678
+6,71,4c04b9a2818d3c5dbf210c06952827b8,https://geop-dev.sotex.app/auth/newpassword/4c04b9a2818d3c5dbf210c06952827b8,newUserPassword,2024-05-27 14:43:19.177,t,2024-05-27 13:43:19.362,2024-05-27 13:45:18.907
+8,141,720b96bf4f06ade779a06062452b4fee,https://geop-dev.sotex.app/auth/newpassword/720b96bf4f06ade779a06062452b4fee,newUserPassword,2024-06-02 00:21:55.575,f,2024-06-01 00:21:55.589,2024-06-01 00:21:55.589
