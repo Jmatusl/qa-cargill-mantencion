@@ -9,6 +9,7 @@ import { useGetMaintenanceList } from "@/hooks/UseQueriesMaintenance";
 import { SkeletonTable } from "../../components/SkeletonTable";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import DataTableConsolidadoMobile from "./DataTableConsolidadoMobile";
 
 interface Role {
   id: number;
@@ -30,16 +31,11 @@ export function ResultTable() {
   const [showAllStatuses, setShowAllStatuses] = useState(false);
 
   // Determinar los estados a mostrar según el switch
-  const statuses = showAllStatuses
-    ? ["SOLICITADO", "EN_PROCESO", "COMPLETADO", "CANCELADO"]
-    : ["SOLICITADO", "EN_PROCESO"];
+  const statuses = showAllStatuses ? ["SOLICITADO", "EN_PROCESO", "COMPLETADO", "CANCELADO"] : ["SOLICITADO", "EN_PROCESO"];
 
   console.log("Estados filtrados:", statuses);
 
-  const { data, isFetching, error } = useGetMaintenanceList(
-    userSession,
-    statuses
-  );
+  const { data, isFetching, error } = useGetMaintenanceList(userSession, statuses);
 
   console.log("Datos obtenidos de la API:", data);
 
@@ -60,8 +56,7 @@ export function ResultTable() {
   useEffect(() => {
     if (userData) {
       console.log("Roles del usuario:", userData.roles);
-      const isNaveOnly =
-        userData.roles.length === 1 && userData.roles[0].role.id === 4;
+      const isNaveOnly = userData.roles.length === 1 && userData.roles[0].role.id === 4;
       setHasPermission(isNaveOnly);
       console.log("¿Tiene permiso restringido?", isNaveOnly);
     }
@@ -71,10 +66,7 @@ export function ResultTable() {
     if (data) {
       const dataConDiasTranscurridos = data.map((item: any) => {
         // Validar fechas
-        const fechaActual =
-          item.status === "COMPLETADO" && item.realSolution
-            ? new Date(item.realSolution)
-            : new Date();
+        const fechaActual = item.status === "COMPLETADO" && item.realSolution ? new Date(item.realSolution) : new Date();
 
         const fechaProp = item.createdAt ? new Date(item.createdAt) : null;
 
@@ -87,12 +79,9 @@ export function ResultTable() {
         }
 
         // Calcular diferencia en días
-        const diferenciaEnMilisegundos =
-          fechaActual.getTime() - fechaProp.getTime();
+        const diferenciaEnMilisegundos = fechaActual.getTime() - fechaProp.getTime();
         const milisegundosEnUnDia = 1000 * 60 * 60 * 24;
-        const diferenciaEnDias = Math.floor(
-          diferenciaEnMilisegundos / milisegundosEnUnDia
-        );
+        const diferenciaEnDias = Math.floor(diferenciaEnMilisegundos / milisegundosEnUnDia);
 
         return {
           ...item,
@@ -104,9 +93,7 @@ export function ResultTable() {
 
       // Filtrar datos según permisos
       if (hasPermission && userData) {
-        const ship = dataConDiasTranscurridos.filter(
-          (item: any) => item.ship?.name === userData.username
-        );
+        const ship = dataConDiasTranscurridos.filter((item: any) => item.ship?.name === userData.username);
         console.log("Datos filtrados por usuario con restricción:", ship);
         setDataConDiasTranscurridos(ship);
       } else {
@@ -120,9 +107,7 @@ export function ResultTable() {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            Error al cargar los datos.
-          </p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">Error al cargar los datos.</p>
         </div>
       </div>
     );
@@ -130,17 +115,13 @@ export function ResultTable() {
 
   return (
     <div>
-      <div className="flex h-full flex-1 flex-col space-y-8 p-8 overflow-x-auto bg-gray-100 dark:bg-slate-800 border rounded-md">
-        <div className="flex items-center justify-between space-y-2">
+      <div className="flex h-full flex-1 flex-col space-y-8 p-2 md:p-8 overflow-x-auto bg-gray-100 dark:bg-slate-800 border rounded-md">
+        <div className="">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Consolidado de Solicitudes de Mantención
-            </h2>
-            <p className="text-muted-foreground text-gray-700 dark:text-gray-300">
-              Listado de todas las solicitudes de mantención y su estado actual.
-            </p>
+            <h2 className="text-sm md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Consolidado de Solicitudes de Mantención</h2>
+            <p className=" text-sm md:text-lg  text-muted-foreground text-gray-700 dark:text-gray-300">Listado de todas las solicitudes de mantención y su estado actual.</p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 justify-end md:-mt-8 ">
             <TailSpin
               visible={isFetching}
               height="30"
@@ -153,7 +134,7 @@ export function ResultTable() {
             />
             <Label
               htmlFor="statusSwitch"
-              className="text-gray-900 dark:text-white"
+              className="text-gray-900 dark:text-white text-xs md:text-lg"
             >
               Mostrar completados y cancelados
             </Label>
@@ -171,13 +152,21 @@ export function ResultTable() {
             <SkeletonTable />
           </>
         ) : data && data.length > 0 ? (
-          <DataTable data={dataConDiasTranscurridos} columns={columns} />
+          <div>
+            <div className="block md:hidden">
+              <DataTableConsolidadoMobile dataConDiasTranscurridos={dataConDiasTranscurridos} />
+            </div>
+            <div className="hidden md:block">
+              <DataTable
+                data={dataConDiasTranscurridos}
+                columns={columns}
+              />
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                No se encontraron resultados.
-              </p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">No se encontraron resultados.</p>
             </div>
           </div>
         )}
