@@ -1,15 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "@/validations/loginSchema";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScaleLoader } from "react-spinners";
 import { z } from "zod";
@@ -55,9 +47,7 @@ function LoginPage() {
 
         // Redirección basada en los roles del usuario autenticado
         if (session?.user) {
-          const userRoles = (
-            session.user as { roles: { roleId: number }[] }
-          ).roles.map((role) => role.roleId);
+          const userRoles = (session.user as { roles: { roleId: number }[] }).roles.map((role) => role.roleId);
 
           if (userRoles.some((roleId) => rolesPermitidos.includes(roleId))) {
             router.push("/dashboard/mantencion");
@@ -84,9 +74,7 @@ function LoginPage() {
   useEffect(() => {
     // Si el usuario ya tiene sesión iniciada y roles asignados, redirige inmediatamente
     if (session?.user) {
-      const userRoles = (
-        session.user as { roles: { roleId: number }[] }
-      ).roles.map((role) => role.roleId);
+      const userRoles = (session.user as { roles: { roleId: number }[] }).roles.map((role) => role.roleId);
 
       if (userRoles.some((roleId) => rolesPermitidos.includes(roleId))) {
         router.push("/dashboard/mantencion");
@@ -103,13 +91,14 @@ function LoginPage() {
       <Card className="w-full max-w-md bg-white">
         <CardHeader className="space-y-1">
           <h2 className="text-2xl font-bold text-center">Mantención</h2>
-          <p className="text-sm text-muted-foreground text-center">
-            Ingrese su usuario y contraseña para acceder al sistema.
-          </p>
+          <p className="text-sm text-muted-foreground text-center">Ingrese su usuario y contraseña para acceder al sistema.</p>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -117,7 +106,11 @@ function LoginPage() {
                   <FormItem>
                     <FormLabel className="font-normal">Correo Electrónico</FormLabel>
                     <FormControl>
-                      <Input className="bg-gray-100" placeholder="Ingrese su correo" {...field} />
+                      <Input
+                        className="bg-gray-100"
+                        placeholder="Ingrese su correo"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -130,7 +123,11 @@ function LoginPage() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel className="font-normal">Contraseña</FormLabel>
-                      <Link href="/auth/forgot-password" className="text-sm text-blue-500 hover:underline">
+                      <Link
+                        href="/auth/forgot-password"
+                        className="text-sm text-blue-500 hover:underline"
+                        tabIndex={-1}
+                      >
                         ¿Olvidaste tu contraseña?
                       </Link>
                     </div>
@@ -146,6 +143,7 @@ function LoginPage() {
                           type="button"
                           onClick={togglePasswordVisibility}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                          tabIndex={-1}
                         >
                           {showPassword ? "Ocultar" : "Mostrar"}
                         </button>
@@ -155,9 +153,16 @@ function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full btn-primary p-2 font-normal" style={{ backgroundColor: "#283c7fff" }}>
+              <Button
+                type="submit"
+                className="w-full btn-primary p-2 font-normal"
+                style={{ backgroundColor: "#283c7fff" }}
+              >
                 {form.formState.isSubmitting ? (
-                  <ScaleLoader color="#ffffff" height={20} />
+                  <ScaleLoader
+                    color="#ffffff"
+                    height={20}
+                  />
                 ) : (
                   "Ingresar"
                 )}
